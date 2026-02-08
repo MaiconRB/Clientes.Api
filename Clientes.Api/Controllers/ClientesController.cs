@@ -1,6 +1,6 @@
-﻿using Clientes.Api.Models;
-using Clientes.Api.Services;
+﻿using Clientes.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Clientes.Api.DTOs;
 
 namespace Clientes.Api.Controllers
 {
@@ -14,28 +14,28 @@ namespace Clientes.Api.Controllers
             _service = service;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> GetAll()
+        public async Task<ActionResult> GetAll()
         {
             var clientes = await _service.GetAllAsync();
             return Ok(clientes);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetById(Guid id)
+        public async Task<ActionResult> GetById(Guid id)
         {
             var cliente = await _service.GetByIdAsync(id);
             if (cliente == null) return NotFound();
             return Ok(cliente);
         }
         [HttpPost]
-        public async Task<ActionResult<Cliente>> Create([FromBody]Cliente cliente)
+        public async Task<ActionResult> Create([FromBody]ClienteCreateDto clienteDto)
         {
-            var criado = await _service.CreateAsync(cliente);
+            var criado = await _service.CreateAsync(clienteDto);
             return CreatedAtAction(nameof(GetById), new { id = criado.Id }, criado);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] Cliente cliente)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ClienteUpdateDto clienteDto)
         {
-            var atualizado = await _service.UpdateAsync(id, cliente);
+            var atualizado = await _service.UpdateAsync(id, clienteDto);
             if (!atualizado) return NotFound();
             return NoContent();
         }

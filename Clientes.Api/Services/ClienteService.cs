@@ -1,5 +1,6 @@
 ﻿using Clientes.Api.Models;
 using Clientes.Api.Repositories;
+using Clientes.Api.DTOs;
 
 namespace Clientes.Api.Services
 {
@@ -10,31 +11,59 @@ namespace Clientes.Api.Services
         {
             _repository = repository;
         }
-        public async Task<IEnumerable<Cliente>> GetAllAsync()
+        public async Task<IEnumerable<ClienteResponseDto>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            var clientes = await _repository.GetAllAsync();
+            return clientes.Select(c => new ClienteResponseDto
+            {
+                Id = c.Id,
+                Nome = c.Nome,
+                Email = c.Email,
+                Documento = c.Documento
+            });
         }
-        public async Task<Cliente?> GetByIdAsync(Guid id)
+        public async Task<ClienteResponseDto?> GetByIdAsync(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+            var cliente = await _repository.GetByIdAsync(id);
+            if (cliente == null) return null;
+            return new ClienteResponseDto
+            {
+                Id = cliente.Id,
+                Nome = cliente.Nome,
+                Email = cliente.Email,
+                Documento = cliente.Documento
+            };
         }
-        public async Task<Cliente> CreateAsync(Cliente cliente)
+        public async Task<ClienteResponseDto> CreateAsync(ClienteCreateDto clienteDto)
         {
-            cliente.Id = Guid.NewGuid();
-            cliente.DataCadastro = DateTime.UtcNow;
-            cliente.Ativo = true;
+            var cliente = new Cliente
+            {
+                Id = Guid.NewGuid(),
+                Nome = clienteDto.Nome,
+                Email = clienteDto.Email,
+                Documento = clienteDto.Documento,
+                DataCadastro = DateTime.UtcNow,
+                Ativo = true
+            };
 
             await _repository.AddAsync(cliente);
-            return cliente;
+
+            return new ClienteResponseDto
+            {
+                Id = cliente.Id,
+                Nome = cliente.Nome,
+                Email = cliente.Email,
+                Documento = cliente.Documento
+            };
         }
-        public async Task<bool> UpdateAsync(Guid id, Cliente cliente)
+        public async Task<bool> UpdateAsync(Guid id, ClienteUpdateDto clienteDto)
         {
             var existente = await _repository.GetByIdAsync(id);
             if (existente == null) return false;
 
-            existente.Nome = cliente.Nome;
-            existente.Email = cliente.Email;
-            existente.Documento = cliente.Documento;
+            existente.Nome = clienteDto.Nome;
+            existente.Email = clienteDto.Email;
+            existente.Documento = clienteDto.Documento;
 
             await _repository.UpdateAsync(existente);
             return true;
