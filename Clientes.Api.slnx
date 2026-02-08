@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="ci.yml" />
+  </Folder>
   <Project Path="Clientes.Api.Tests/Clientes.Api.Tests.csproj" Id="f0e16237-becc-4e82-a4f8-d46df8e40743" />
   <Project Path="Clientes.Api/Clientes.Api.csproj" />
 </Solution>
